@@ -111,7 +111,7 @@ fn create_http_fetch_future(
     &content_config.headers,
     method,
     content_config.client.user_agent,
-    &data,
+    data.as_deref(),
   )?;
 
   if let Some(data) = data {
@@ -179,9 +179,10 @@ fn create_fetch_response(metadata: FetchResponseMetadata, rid: ResourceId) -> Fe
 }
 
 fn encode_body_chunk(chunk: bytes::Bytes) -> Vec<u8> {
-  let mut chunk = chunk.to_vec();
-  chunk.push(BODY_CHUNK_CONTINUES);
-  chunk
+  let mut encoded = Vec::with_capacity(chunk.len() + 1);
+  encoded.extend_from_slice(&chunk);
+  encoded.push(BODY_CHUNK_CONTINUES);
+  encoded
 }
 
 fn encode_body_done() -> Vec<u8> {

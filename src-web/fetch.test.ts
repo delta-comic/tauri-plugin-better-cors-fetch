@@ -104,10 +104,13 @@ describe('createCORSFetch', () => {
     const contentConfig = getContentConfig(fetchCall!)
     expect(contentConfig).toMatchObject({
       client: { instanceKey: '', userAgent: 'vitest-agent' },
-      data: Array.from(encoder.encode('hello')),
       method: 'POST',
       url: 'https://api.example.com/items'
     })
+    expect(contentConfig.data).toBeInstanceOf(Uint8Array)
+    expect(Array.from(contentConfig.data as Uint8Array)).toEqual(
+      Array.from(encoder.encode('hello'))
+    )
     expect(contentConfig.headers).toContainEqual(['x-test', '1'])
     expect(
       calls.filter(call => call.cmd === 'plugin:better-cors-fetch|fetch_read_body')

@@ -12,6 +12,7 @@ export interface CORSFetchConfig {
 }
 
 export type CORSFetchInit = RequestInit & Partial<CORSFetchConfig['request']>
+type IpcContentConfig = Omit<ContentConfig, 'data'> & { data: Uint8Array | null }
 
 interface ReadStreamContext {
   signal?: AbortSignal | null
@@ -89,7 +90,7 @@ async function readStream(
       })
       const dataUint8 = new Uint8Array(data)
       const lastByte = dataUint8[dataUint8.byteLength - 1]
-      const actualData = dataUint8.slice(0, dataUint8.byteLength - 1)
+      const actualData = dataUint8.subarray(0, dataUint8.byteLength - 1)
 
       if (lastByte === 1) {
         if (chunkBuffer.length > 0) {
@@ -171,16 +172,16 @@ export function createCORSFetch(getConfig: () => CORSFetchConfig) {
     signal?.addEventListener('abort', onAbort)
 
     const req = input instanceof Request ? input : new Request(input, init)
-    const buffer = await req.arrayBuffer()
+    const buffer = req.body === null ? null : await req.arrayBuffer()
 
     if (signal?.aborted) throw cancelError
 
     try {
-      const contentConfig: ContentConfig = {
+      const contentConfig: IpcContentConfig = {
         method: req.method,
         url: urlStr,
         headers: Array.from(req.headers.entries()),
-        data: buffer.byteLength ? Array.from(new Uint8Array(buffer)) : null,
+        data: buffer?.byteLength ? new Uint8Array(buffer) : null,
         client: config.request
       }
 

@@ -4,10 +4,10 @@ use crate::Result;
 
 #[inline]
 pub fn create_headers(
-  raw_headers: &Vec<(String, String)>,
+  raw_headers: &[(String, String)],
   method: Method,
   user_agent: Option<String>,
-  data: &Option<Vec<u8>>,
+  data: Option<&[u8]>,
 ) -> Result<HeaderMap> {
   let mut headers = HeaderMap::with_capacity(raw_headers.len());
   for (h, v) in raw_headers {

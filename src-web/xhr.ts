@@ -59,6 +59,14 @@ function combineUint8Arrays(chunks: Uint8Array[], totalSize: number): Uint8Array
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  if (
+    bytes.byteOffset === 0 &&
+    bytes.byteLength === bytes.buffer.byteLength &&
+    bytes.buffer instanceof ArrayBuffer
+  ) {
+    return bytes.buffer
+  }
+
   const buffer = new ArrayBuffer(bytes.byteLength)
   new Uint8Array(buffer).set(bytes)
   return buffer
@@ -562,18 +570,18 @@ export function createCORSXMLHttpRequestConstructor(
     }
 
     private async readResponseBody(requestId: number, response: Response) {
-      const chunks: Uint8Array[] = []
       const decoder = this.createTextDecoder()
+      const chunks: Uint8Array[] | null = decoder ? null : []
       const reader = response.body?.getReader()
 
-      if (!reader) return new Uint8Array()
+      if (!reader) return null
 
       while (this.isActiveRequest(requestId)) {
         const { done, value } = await reader.read()
         if (done) break
         if (!value) continue
 
-        chunks.push(value)
+        chunks?.push(value)
         this._loaded += value.byteLength
         if (decoder) this._responseText += decoder.decode(value, { stream: true })
         this.setReadyState(XHR_LOADING)
@@ -581,7 +589,7 @@ export function createCORSXMLHttpRequestConstructor(
       }
 
       if (decoder) this._responseText += decoder.decode()
-      return combineUint8Arrays(chunks, this._loaded)
+      return chunks ? combineUint8Arrays(chunks, this._loaded) : null
     }
 
     private resetResponse() {
@@ -597,13 +605,14 @@ export function createCORSXMLHttpRequestConstructor(
       this._total = null
     }
 
-    private setFinalResponse(bytes: Uint8Array) {
+    private setFinalResponse(bytes: Uint8Array | null) {
       if (!this.shouldDecodeText()) {
+        const body = bytes ?? new Uint8Array()
         if (this._responseType === 'arraybuffer') {
-          this._response = toArrayBuffer(bytes)
+          this._response = toArrayBuffer(body)
           return
         }
-        this._response = new Blob([toArrayBuffer(bytes)], { type: this.getResponseMimeType() })
+        this._response = new Blob([toArrayBuffer(body)], { type: this.getResponseMimeType() })
         return
       }
 
