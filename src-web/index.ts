@@ -13,8 +13,6 @@ import type { GetCookieConfig } from './types/GetCookieConfig'
 import type { SetCookieConfig } from './types/SetCookieConfig'
 import { createCORSXMLHttpRequestConstructor } from './xhr'
 
-export type { CORSFetchConfig, CORSFetchInit } from './fetch'
-
 declare global {
   interface Window {
     CORSFetch?: CORSFetch
