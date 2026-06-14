@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/wenxig/tauri-plugin-better-cors-fetch/compare/1.7.0...1.8.0) (2026-06-14)
+
+### Features
+
+- performers better [pub] ([2f549e0](https://github.com/wenxig/tauri-plugin-better-cors-fetch/commit/2f549e0d7b3829af36b686ac6826dcfb6790fd24))
+
 # [1.7.0](https://github.com/wenxig/tauri-plugin-better-cors-fetch/compare/1.6.0...1.7.0) (2026-06-10)
 
 ### Features

@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-better-cors-fetch"
-version = "1.7.0"
+version = "1.8.0"
 description = "Enabling Cross-Origin Resource Sharing (CORS) for Fetch Requests within Tauri applications."
 keywords = ["tauri-plugin", "CORS", "fetch", "unofficial"]
 authors = ["Wenxig <wenxinguo12@gmail.com>", "Del Wang <hello@xbox.work>"]
